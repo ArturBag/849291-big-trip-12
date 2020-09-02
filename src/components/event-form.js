@@ -284,8 +284,8 @@ export default class EventForm extends AbstractSmartComponent {
 
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
 
-    let submitButtonText = this._externalData.saveButtonText;
-    let resetButtonText = this._mode === PointControllerMode.ADDING ? this._externalData.cancelButtonText
+    const submitButtonText = this._externalData.saveButtonText;
+    const resetButtonText = this._mode === PointControllerMode.ADDING ? this._externalData.cancelButtonText
       : this._externalData.deleteButtonText;
     const isCloseFormButtonDisplayed = this._mode === PointControllerMode.ADDING ? false : true;
     const isFavoriteButtonDisplayed = this._mode === PointControllerMode.ADDING ? false : true;
