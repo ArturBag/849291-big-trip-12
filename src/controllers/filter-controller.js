@@ -1,12 +1,12 @@
 import FilterComponent from '../components/filters.js';
+import {getPointsByFilter} from '../utils/filter.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
 import {filterTypes} from '../const.js';
 
 
 export default class FilterController {
-  constructor(container, pointsModel) {
+  constructor(container) {
     this._container = container;
-    this._pointsModel = pointsModel;
 
     this._activeFilterType = filterTypes[`filter-everything`].name;
     this._filterComponent = null;
@@ -15,21 +15,25 @@ export default class FilterController {
 
   }
 
-  render() {
+  render(pointsModel) {
+
+    this._pointsModel = pointsModel;
+    const points = this._pointsModel.getPointsAll();
     const container = this._container;
-    const filters = Object.values(filterTypes).map((filterId) => {
-      const id = `filter-${filterId.name.toLowerCase()}`;
+    const filters = Object.values(filterTypes).map((filterType) => {
+      const id = `filter-${filterType.name.toLowerCase()}`;
 
       return {
         id,
-        name: filterId.name,
-        checked: filterId.name === this._activeFilterType
+        name: filterType.name,
+        disabled: points.length ? getPointsByFilter(points, filterType.name).length === 0 : false,
+        checked: filterType.name === this._activeFilterType
       };
     });
 
     const oldComponent = this._filterComponent;
 
-    this._filterComponent = new FilterComponent(filters);
+    this._filterComponent = new FilterComponent(filters, this._pointsModel);
 
     this._filterComponent.setFilterChangeHandler(this._onFilterChange);
     if (oldComponent) {

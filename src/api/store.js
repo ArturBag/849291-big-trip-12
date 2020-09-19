@@ -45,8 +45,6 @@ export default class Store {
 
   }
 
-
-  // правильный код. не удалять
   removeItem(key) {
 
     const store = this.getItems();

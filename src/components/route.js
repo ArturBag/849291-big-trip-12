@@ -3,15 +3,16 @@ import {getDefaultEvents} from '../controllers/trip-controller.js';
 import {MONTH_NAMES} from '../const.js';
 
 export default class Route extends AbstractComponent {
-  constructor(routeData) {
+  constructor(routeItems) {
     super();
 
-    this._routeData = routeData;
+    this._routeItems = routeItems;
   }
 
   getTemplate() {
 
-    const data = getDefaultEvents(this._routeData);
+    const MIN_DESTINATIONS_QTY_FOR_ROUTE_SHRINK = 3;
+    const data = getDefaultEvents(this._routeItems);
 
     const tripDaysItems = data.sort((a, b)=> a.startDate - b.startDate);
     let destinationsMarkup = ``;
@@ -23,8 +24,8 @@ export default class Route extends AbstractComponent {
 
     const cities = tripDaysItems.map((it) => it.city).join(` &mdash; `);
 
-    destinationsMarkup = tripDaysItems.length > 3 ?
-      `${tripDaysItems[0].city}` + ` ... ` + `${tripDaysItems[tripDaysItems.length - 1].city}` :
+    destinationsMarkup = tripDaysItems.length > MIN_DESTINATIONS_QTY_FOR_ROUTE_SHRINK ?
+      `${tripDaysItems[0].city} ... ${tripDaysItems[tripDaysItems.length - 1].city}` :
       cities;
 
 

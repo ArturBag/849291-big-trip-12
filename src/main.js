@@ -5,16 +5,16 @@ import Route from './components/route.js';
 import Menu, {MenuItem} from './components/menu.js';
 import Statistics from './components/statistics.js';
 import PriceController from './controllers/price-controller.js';
-import FilterController from './controllers/filter-controller.js';
 import TripController from './controllers/trip-controller.js';
 import PointsModel from './models/points.js';
 import {RenderPosition, render, createElement} from './utils/render.js';
-import {getDestinationsInfo, getOffersInfo, getCitiesList} from './const.js';
+import {DEFAULT_SORTING_TYPE, getDestinationsInfo, getOffersInfo, getCitiesList} from './const.js';
 
 
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=`;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 const LOADING_LIST_PRELOADER = createElement(`<p class="trip-events__msg">Loading...</p>`);
+
 const STORE_PREFIX = `big-trip-localstorage`;
 const STORE_VER = `v1`;
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
@@ -25,6 +25,7 @@ const addPointButton = header.querySelector(`.trip-main__event-add-btn`);
 
 const tripControlHeaders = header.querySelectorAll(`.trip-main__trip-controls h2`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
+const filtersContainer = tripControlHeaders[1];
 
 const showListPreloader = ()=> {
   tripEventsContainer.prepend(LOADING_LIST_PRELOADER);
@@ -58,13 +59,7 @@ const renderPriceData = ()=> {
   priceController.render();
 };
 
-const renderFiltesrData = ()=> {
-  const filterController = new FilterController(tripControlHeaders[1], pointsModel);
-  filterController.render();
-};
-
-
-const tripControllerComponent = new TripController(tripEventsContainer, pointsModel, apiWithProvider);
+const tripControllerComponent = new TripController(tripEventsContainer, pointsModel, apiWithProvider, filtersContainer);
 
 let statisticsComponent = new Statistics(pointsModel, pointsModel.getPointsAll());
 
@@ -89,6 +84,7 @@ menuComponent.setOnChange((menuItem) => {
     case MenuItem.TABLE:
       menuComponent.setActiveItem(MenuItem.TABLE);
       statisticsComponent.hide();
+
       tripControllerComponent.show();
       break;
     case MenuItem.STATS:
@@ -96,6 +92,7 @@ menuComponent.setOnChange((menuItem) => {
       tripControllerComponent.hide();
       redrawStatistics();
       statisticsComponent.show();
+      tripControllerComponent.setDefaultSortType(DEFAULT_SORTING_TYPE);
       break;
 
   }
@@ -107,7 +104,6 @@ const getPoints = new Promise((res) => {
     pointsModel.setPoints(points);
     renderBriefRouteProgram(points);
     renderPriceData();
-    renderFiltesrData();
     res();
   });
 });
@@ -132,6 +128,7 @@ const getOffers = new Promise((res) => {
 Promise.all([getPoints, getDestinations, getOffers])
   .then(()=> {
     tripControllerComponent.render();
+    tripControllerComponent.renderFilters();
     hideListPreloader();
   });
 

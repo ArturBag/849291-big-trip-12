@@ -11,6 +11,7 @@ export default class Sorting extends AbstractComponent {
     super();
 
     this._currenSortType = SortType.EVENT;
+    this._activeSortType = SortType.EVENT;
   }
 
   sortTypeChangeHandler(handler) {
@@ -21,13 +22,13 @@ export default class Sorting extends AbstractComponent {
         return;
       }
 
-      const sortType = evt.target.dataset.sortType;
+      this._activeSortType = evt.target.dataset.sortType;
 
-      if (this._currenSortType === sortType) {
+      if (this._currenSortType === this._activeSortType) {
         return;
       }
 
-      this._currenSortType = sortType;
+      this._currenSortType = this._activeSortType;
 
       handler(this._currenSortType);
 
@@ -35,18 +36,26 @@ export default class Sorting extends AbstractComponent {
 
   }
 
+  resetSortingToDefault() {
+    this._currenSortType = SortType.EVENT;
+    this._activeSortType = SortType.EVENT;
+  }
+
+
   getTemplate() {
 
     return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
           <span class="trip-sort__item  trip-sort__item--day">Day</span>
 
           <div class="trip-sort__item  trip-sort__item--event">
-            <input id="sort-event" data-sort-type="${SortType.EVENT}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-event" checked>
+            <input id="sort-event" data-sort-type="${SortType.EVENT}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-event"
+            ${SortType.EVENT === this._currenSortType ? `checked` : ``}>
             <label class="trip-sort__btn" for="sort-event">Event</label>
           </div>
 
           <div class="trip-sort__item  trip-sort__item--time">
-            <input id="sort-time" data-sort-type="${SortType.TIME}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time">
+            <input id="sort-time" data-sort-type="${SortType.TIME}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time"
+            ${SortType.TIME === this._currenSortType ? `checked` : ``}>
             <label class="trip-sort__btn" for="sort-time">
               Time
               <svg class="trip-sort__direction-icon" width="8" height="10" viewBox="0 0 8 10">
@@ -56,7 +65,8 @@ export default class Sorting extends AbstractComponent {
           </div>
 
         <div class="trip-sort__item  trip-sort__item--price">
-          <input id="sort-price" data-sort-type="${SortType.PRICE}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price">
+          <input id="sort-price" data-sort-type="${SortType.PRICE}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price"
+          ${SortType.PRICE === this._currenSortType ? `checked` : ``}>
           <label class="trip-sort__btn" for="sort-price">
             Price
             <svg class="trip-sort__direction-icon" width="8" height="10" viewBox="0 0 8 10">

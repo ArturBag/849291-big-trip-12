@@ -1,4 +1,5 @@
 export const DESTINATION_INFO = [];
+export const DEFAULT_SORTING_TYPE = `event`;
 
 export const getDestinationsInfo = (data) => {
   data.forEach((it)=> {

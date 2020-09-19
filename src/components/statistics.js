@@ -31,48 +31,49 @@ export default class Statistics extends AbstractSmartComponent {
 
   _showMoneyStatistics() {
     const moneyCtx = this.getElement().querySelector(`.statistics__chart--money`);
-    const moneyFormatter = (val) => `€ ${val}`;
+    const formatToMoney = (val) => `€ ${val}`;
     const moneyTitle = `money`;
 
     const moneyData = this._getData(this._pointsData);
     const moneyPrices = moneyData.map((it) => it.price);
 
+    const pointTypes = moneyData.map((it) => `${typeSymbols.get(it.type.toLowerCase())} ${it.type.toUpperCase()}`);
 
-    const pointTypes = moneyData.map((it) => typeSymbols.get(it.type.toLowerCase()) + ` ` + it.type.toUpperCase());
+    const moneyChartData = [moneyCtx, formatToMoney, moneyTitle, pointTypes, moneyPrices];
 
-    const moneyChartData = [moneyCtx, moneyFormatter, moneyTitle, pointTypes, moneyPrices];
-
-    this._displatStatistics(moneyChartData);
+    this._displayStatistics(moneyChartData);
 
   }
 
   _showTransportStatistics() {
     const transportCtx = this.getElement().querySelector(`.statistics__chart--transport`);
-    const transportFormatter = (val) => `${val}x`;
+    const formatToTransport = (val) => `${val}x`;
     const transportTitle = `transport`;
     const transportData = this._getData(this._pointsData);
 
-    const pointTypes = transportData.map((it) => typeSymbols.get(it.type.toLowerCase()) + ` ` + it.type.toUpperCase());
+    const pointTypes = transportData.map((it) => `${typeSymbols.get(it.type.toLowerCase())} ${it.type.toUpperCase()}`);
+
     const transportQty = transportData.map((it) => it.quantity);
 
-    const transportChartData = [transportCtx, transportFormatter, transportTitle, pointTypes, transportQty];
+    const transportChartData = [transportCtx, formatToTransport, transportTitle, pointTypes, transportQty];
 
-    this._displatStatistics(transportChartData);
+    this._displayStatistics(transportChartData);
 
   }
 
   _showTimeStatistics() {
     const timeCtx = this.getElement().querySelector(`.statistics__chart--time`);
-    const timeFormatter = (val) => `${val}H`;
+    const formatToTime = (val) => `${val}H`;
     const timeTitle = `time spent`;
     const timeData = this._getData(this._pointsData);
 
-    const pointTypes = timeData.map((it) => typeSymbols.get(it.type.toLowerCase()) + ` ` + it.type.toUpperCase());
+    const pointTypes = timeData.map((it) => `${typeSymbols.get(it.type.toLowerCase())} ${it.type.toUpperCase()}`);
+
     const hours = timeData.map((it) => it.hours);
 
-    const timeChartData = [timeCtx, timeFormatter, timeTitle, pointTypes, hours];
+    const timeChartData = [timeCtx, formatToTime, timeTitle, pointTypes, hours];
 
-    this._displatStatistics(timeChartData);
+    this._displayStatistics(timeChartData);
 
   }
 
@@ -116,7 +117,7 @@ export default class Statistics extends AbstractSmartComponent {
     return typesData;
   }
 
-  _displatStatistics(chartData) {
+  _displayStatistics(chartData) {
 
     const [ctx, formatter, titleText, pointTypes, typesData] = chartData;
 

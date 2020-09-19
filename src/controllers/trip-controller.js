@@ -1,8 +1,10 @@
 import NoRoutePoints from '../components/no-route-points.js';
 import Sorting, {SortType} from '../components/sorting.js';
 import TripDaysList from '../components/trip-days-list.js';
+import FilterController from './filter-controller.js';
 import PointController, {Mode as PointControllerMode, EmptyPoint} from './point-controller.js';
 import {render, RenderPosition} from '../utils/render.js';
+import {DEFAULT_SORTING_TYPE} from '../const.js';
 
 const HIDDEN_CLASS = `visually-hidden`;
 
@@ -18,9 +20,9 @@ const getDates = (events)=> {
 
 };
 
-export const getDefaultEvents = (data) => {
+export const getDefaultEvents = (events) => {
   let newData = [];
-  const routeData = data.map((it) => Object.assign({}, it));
+  const routeData = events.map((it) => Object.assign({}, it));
   const dates = getDates(routeData).sort((a, b) => a.day - b.day);
 
   dates.forEach((date) => {
@@ -38,9 +40,9 @@ export const getDefaultEvents = (data) => {
 };
 
 
-const renderTripPoints = (tripDaysListComponent, routeData, onDataChange, onViewChange) => {
+const renderTripPoints = (tripDaysListComponent, routeItems, onDataChange, onViewChange) => {
 
-  return routeData.map((route, routeIndex) => {
+  return routeItems.map((route, routeIndex) => {
 
     const pointController = new PointController(tripDaysListComponent, onDataChange, onViewChange);
 
@@ -53,10 +55,11 @@ const renderTripPoints = (tripDaysListComponent, routeData, onDataChange, onView
 
 
 export default class TripController {
-  constructor(container, pointsModel, api) {
+  constructor(container, pointsModel, api, filtersContainer) {
 
     this._pointsModel = pointsModel;
     this._container = container;
+    this._filtersContainer = filtersContainer;
     this._api = api;
 
 
@@ -64,7 +67,10 @@ export default class TripController {
     this._showingPointsCount = null;
     this._creatingPoint = null;
 
+    this._filterController = new FilterController(this._filtersContainer);
+
     this._noRoutePoints = new NoRoutePoints();
+
     this._sorting = new Sorting();
     this._tripDaysList = new TripDaysList();
 
@@ -116,6 +122,10 @@ export default class TripController {
 
   }
 
+  renderFilters() {
+    this._filterController.render(this._pointsModel);
+  }
+
   createPoint() {
 
 
@@ -158,9 +168,9 @@ export default class TripController {
   _updatePoints() {
     this._removePoints();
 
-    const data = getDefaultEvents(this._pointsModel.getPoints().slice());
+    const points = getDefaultEvents(this._pointsModel.getPoints().slice());
 
-    this._renderPoints(data);
+    this._renderPoints(points);
   }
 
   _onViewChange() {
@@ -194,6 +204,7 @@ export default class TripController {
           this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
           this._onSortTypeChange(this._sorting._currenSortType);
           pointController.removeFlatpickr();
+          this.renderFilters();
         })
         .catch(()=>{
           pointController.showStyledServerError();
@@ -207,6 +218,7 @@ export default class TripController {
         this._pointsModel.removePoint(oldData.id);
         this._updatePoints();
         pointController.removeFlatpickr();
+        this.renderFilters();
       })
       .catch(()=>{
         pointController.showStyledServerError();
@@ -229,6 +241,7 @@ export default class TripController {
           pointController.render(parsedResponseData, index, PointControllerMode.DEFAULT);
           this._onSortTypeChange(this._sorting._currenSortType);
           pointController.removeFlatpickr();
+          this.renderFilters();
         }
       })
       .catch(()=>{
@@ -239,6 +252,13 @@ export default class TripController {
 
   }
 
+  setDefaultSortType(defaultSortType) {
+
+    this._sorting.getElement().querySelectorAll(`input`)[0].checked = true;
+    this._sorting.resetSortingToDefault();
+
+    this._onSortTypeChange(defaultSortType);
+  }
 
   _onSortTypeChange(sortType) {
 
@@ -276,7 +296,7 @@ export default class TripController {
 
   _onFilterChange() {
     this._updatePoints();
-    this._onSortTypeChange(this._activeSortType);
+    this.setDefaultSortType(DEFAULT_SORTING_TYPE);
   }
 
 
